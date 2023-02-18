@@ -4,6 +4,9 @@
     MIT License
 */
 
+import { Readable as StreamReadable } from 'node:stream';
+import { Transform as StreamTransform } from 'node:stream';
+
 import { EventEmitter } from 'event-emitter';
 import { FileEntry } from 'file-entry';
 import { Get } from 'hold';
@@ -135,6 +138,7 @@ export declare namespace ReadmeGenerator {
         readonly readmeMdMjsGraphsLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdDtsGraphsLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdLines: Get<AsyncGenerator<string, void, void>>;
+        readonly readmeMdLineStream: Get<StreamReadable>;
     };
 
     type Self = EventEmitter<EventSpecs> & {

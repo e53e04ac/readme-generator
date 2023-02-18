@@ -170,18 +170,18 @@ const constructor = ((options) => {
                 });
             }));
         }),
-        readmeMdHeaderLines: hold(async function* () {
+        readmeMdHeaderLines: (async function* () {
             const packageName = await _self.packageName();
             yield `# ${packageName}`;
         }),
-        readmeMdNpmInstallLines: hold(async function* () {
+        readmeMdNpmInstallLines: (async function* () {
             const packageRepositoryName = await _self.packageRepositoryName();
             yield '';
             yield '~~~~~ sh';
             yield `npm install ${packageRepositoryName}`;
             yield '~~~~~';
         }),
-        readmeMdImportLines: hold(async function* () {
+        readmeMdImportLines: (async function* () {
             const dtsContents = await _self.dtsContents();
             const packageRepositoryName = await _self.packageRepositoryName();
             for (const { exports } of dtsContents) {
@@ -199,7 +199,7 @@ const constructor = ((options) => {
                 yield '~~~~~';
             }
         }),
-        readmeMdPackageJsonGraphLines: hold(async function* () {
+        readmeMdPackageJsonGraphLines: (async function* () {
             const dependencies = await _self.dependencies();
             yield '';
             yield '~~~~~ mermaid';
@@ -233,7 +233,7 @@ const constructor = ((options) => {
             }
             yield '~~~~~';
         }),
-        readmeMdMjsGraphsLines: hold(async function* () {
+        readmeMdMjsGraphsLines: (async function* () {
             const packageRepositoryName = await _self.packageRepositoryName();
             const mjsContents = await _self.mjsContents();
             for (const { file, imports, exports } of mjsContents) {
@@ -276,7 +276,7 @@ const constructor = ((options) => {
                 yield '~~~~~';
             }
         }),
-        readmeMdDtsGraphsLines: hold(async function* () {
+        readmeMdDtsGraphsLines: (async function* () {
             const packageRepositoryName = await _self.packageRepositoryName();
             const dtsContents = await _self.dtsContents();
             for (const { file, imports, exports } of dtsContents) {
@@ -319,13 +319,18 @@ const constructor = ((options) => {
                 yield '~~~~~';
             }
         }),
-        readmeMdLines: hold(async function* () {
+        readmeMdLines: (async function* () {
             yield* _self.readmeMdHeaderLines();
             yield* _self.readmeMdNpmInstallLines();
             yield* _self.readmeMdImportLines();
             yield* _self.readmeMdPackageJsonGraphLines();
             yield* _self.readmeMdMjsGraphsLines();
             yield* _self.readmeMdDtsGraphsLines();
+        }),
+        readmeMdLineStream: (() => {
+            return StreamReadable.from(_self.readmeMdLines(), {
+                objectMode: true,
+            });
         }),
     });
 
@@ -337,9 +342,7 @@ const constructor = ((options) => {
         }),
         generate: (async () => {
             await streamPipeline([
-                StreamReadable.from(_self.readmeMdLines(), {
-                    objectMode: true,
-                }),
+                _self.readmeMdLineStream(),
                 new StreamTransform({
                     writableObjectMode: true,
                     readableObjectMode: false,
