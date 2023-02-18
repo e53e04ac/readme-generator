@@ -354,7 +354,7 @@ const constructor = ((options) => {
                         callback();
                     },
                 }),
-                fsCreateWriteStream(_self.readmeMdFile().path()),
+                await _self.readmeMdFile().createWriteStream(),
             ]);
         }),
     });
