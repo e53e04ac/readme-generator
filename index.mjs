@@ -73,7 +73,7 @@ const constructor = ((options) => {
             return await _self.packageLockJsonFile().readJson();
         }),
         npmjsUrl: ((params) => {
-            return new URL(`https://www.npmjs.org/package/${params.name}/v/${params.version}`);
+            return new URL(`https://www.npmjs.com/package/${params.name}/v/${params.version}`);
         }),
         githubUrl: ((params) => {
             return new URL(`https://github.com/${params.name}/tree/${params.version}`);
