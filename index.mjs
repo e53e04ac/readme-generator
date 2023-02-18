@@ -343,18 +343,7 @@ const constructor = ((options) => {
         generate: (async () => {
             await streamPipeline([
                 _self.readmeMdLineStream(),
-                new StreamTransform({
-                    writableObjectMode: true,
-                    readableObjectMode: false,
-                    transform(chunk, encoding, callback) {
-                        this.push(chunk + '\r\n');
-                        callback();
-                    },
-                    final(callback) {
-                        callback();
-                    },
-                }),
-                await _self.readmeMdFile().createWriteStream(),
+                await _self.readmeMdFile().createWriteLineStream(),
             ]);
         }),
     });
