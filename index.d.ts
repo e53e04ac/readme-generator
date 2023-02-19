@@ -143,9 +143,7 @@ export declare namespace ReadmeGenerator {
 
     type Self = EventEmitter<EventSpecs> & {
         readonly _ReadmeGenerator: Get<_Self>;
-        readonly generate: {
-            (): Promise<void>;
-        };
+        readonly generate: Get<Promise<void>>;
     };
 
     type Constructor = {

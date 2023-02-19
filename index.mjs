@@ -340,7 +340,7 @@ const constructor = ((options) => {
         _ReadmeGenerator: (() => {
             return _self;
         }),
-        generate: (async () => {
+        generate: hold(async () => {
             await streamPipeline([
                 _self.readmeMdLineStream(),
                 await _self.readmeMdFile().createWriteLineStream(),
