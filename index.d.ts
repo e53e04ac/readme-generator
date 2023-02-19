@@ -5,7 +5,6 @@
 */
 
 import { Readable as StreamReadable } from 'node:stream';
-import { Transform as StreamTransform } from 'node:stream';
 
 import { EventEmitter } from 'event-emitter';
 import { FileEntry } from 'file-entry';
@@ -13,8 +12,6 @@ import { Get } from 'hold';
 import { ValueOrGet } from 'hold';
 
 export declare namespace ReadmeGenerator {
-
-    type EventSpecs = Record<never, never>;
 
     type PackageJson = {
         readonly name: string;
@@ -95,6 +92,8 @@ export declare namespace ReadmeGenerator {
         readonly mjsFileNames: ValueOrGet<string[]>;
         readonly dtsFileNames: ValueOrGet<string[]>;
     };
+
+    type EventSpecs = Record<never, never>;
 
     type _Self = {
         readonly options: Get<Options>;

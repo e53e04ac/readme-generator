@@ -75,7 +75,6 @@ graph RL;
   M(["index.d.ts"])
   subgraph "node:stream";
     I_0_0(["Readable"]);
-    I_0_1(["Transform"]);
   end;
   subgraph "event-emitter";
     I_1_0(["EventEmitter"]);
@@ -88,7 +87,6 @@ graph RL;
     I_3_1(["ValueOrGet"]);
   end;
   M ----> I_0_0;
-  M ----> I_0_1;
   M ----> I_1_0;
   M ----> I_2_0;
   M ----> I_3_0;
