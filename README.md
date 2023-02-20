@@ -38,30 +38,24 @@ graph RL;
     E_0(["ReadmeGenerator"]);
   end;
   M(["index.mjs"])
-  subgraph "node:fs";
-    I_0_0(["createWriteStream"]);
-  end;
   subgraph "node:stream";
-    I_1_0(["Readable"]);
-    I_1_1(["Transform"]);
+    I_0_0(["Readable"]);
   end;
   subgraph "node:stream/promises";
-    I_2_0(["pipeline"]);
+    I_1_0(["pipeline"]);
   end;
   subgraph "event-emitter";
-    I_3_0(["EventEmitter"]);
+    I_2_0(["EventEmitter"]);
   end;
   subgraph "hold";
-    I_4_0(["hold"]);
-    I_4_1(["unwrap"]);
+    I_3_0(["hold"]);
+    I_3_1(["unwrap"]);
   end;
   M ----> I_0_0;
   M ----> I_1_0;
-  M ----> I_1_1;
   M ----> I_2_0;
   M ----> I_3_0;
-  M ----> I_4_0;
-  M ----> I_4_1;
+  M ----> I_3_1;
   E_0 ----> M;
 ~~~~~
 

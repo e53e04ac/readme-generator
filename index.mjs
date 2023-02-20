@@ -4,9 +4,7 @@
     MIT License
 */
 
-import { createWriteStream as fsCreateWriteStream } from 'node:fs';
 import { Readable as StreamReadable } from 'node:stream';
-import { Transform as StreamTransform } from 'node:stream';
 import { pipeline as streamPipeline } from 'node:stream/promises';
 
 import { EventEmitter } from 'event-emitter';
