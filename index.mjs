@@ -107,18 +107,28 @@ const constructor = ((options) => {
         mjsContent: (async (params) => {
             const lines = await params.file.readLines();
             const imports = lines.flatMap((line) => {
-                const match = line.match(/^import { ([^ ]+)(?: as (?:[^ ]+))? } from '([^']+)';$/);
-                if (match == null) {
-                    return [];
+                {
+                    const match = line.match(/^import { ([^ ]+)(?: as (?:[^ ]+))? } from '([^']+)';$/);
+                    if (match != null) {
+                        return [{ packageName: match[2], name: match[1] }];
+                    }
                 }
-                return [{ packageName: match[2], name: match[1] }];
+                {
+                    const match = line.match(/^import '([^']+)';$/);
+                    if (match != null) {
+                        return [{ packageName: match[1] }];
+                    }
+                }
+                return [];
             });
             const exports = lines.flatMap((line) => {
-                const match = line.match(/^export { ([^ ]+)(?: as ([^ ]+))? };$/);
-                if (match == null) {
-                    return [];
+                {
+                    const match = line.match(/^export { ([^ ]+)(?: as ([^ ]+))? };$/);
+                    if (match != null) {
+                        return [{ name: match[2] ?? match[1] }];
+                    }
                 }
-                return [{ name: match[2] ?? match[1] }];
+                return [];
             });
             return { ...params, imports, exports };
         }),
@@ -132,11 +142,19 @@ const constructor = ((options) => {
         dtsContent: (async (params) => {
             const lines = await params.file.readLines();
             const imports = lines.flatMap((line) => {
-                const match = line.match(/^import { ([^ ]+)(?: as (?:[^ ]+))? } from '([^']+)';$/);
-                if (match == null) {
-                    return [];
+                {
+                    const match = line.match(/^import { ([^ ]+)(?: as (?:[^ ]+))? } from '([^']+)';$/);
+                    if (match != null) {
+                        return [{ packageName: match[2], name: match[1] }];
+                    }
                 }
-                return [{ packageName: match[2], name: match[1] }];
+                {
+                    const match = line.match(/^import '([^']+)';$/);
+                    if (match != null) {
+                        return [{ packageName: match[1] }];
+                    }
+                }
+                return [];
             });
             const exports = lines.flatMap((line) => {
                 {
@@ -243,7 +261,7 @@ const constructor = ((options) => {
                         map1 = new Map();
                         map0.set(item.packageName, map1);
                     }
-                    map1.set(item.name, {});
+                    map1.set(item.name ?? ' ', {});
                 }
                 yield '';
                 yield '~~~~~ mermaid';
@@ -286,7 +304,7 @@ const constructor = ((options) => {
                         map1 = new Map();
                         map0.set(item.packageName, map1);
                     }
-                    map1.set(item.name, {});
+                    map1.set(item.name ?? ' ', {});
                 }
                 yield '';
                 yield '~~~~~ mermaid';

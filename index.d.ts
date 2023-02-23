@@ -65,7 +65,7 @@ export declare namespace ReadmeGenerator {
         readonly file: FileEntry;
         readonly imports: {
             readonly packageName: string;
-            readonly name: string;
+            readonly name?: string;
         }[];
         readonly exports: {
             readonly name: string;
@@ -76,7 +76,7 @@ export declare namespace ReadmeGenerator {
         readonly file: FileEntry;
         readonly imports: {
             readonly packageName: string;
-            readonly name: string;
+            readonly name?: string;
         }[];
         readonly exports: {
             readonly exportType: string;
