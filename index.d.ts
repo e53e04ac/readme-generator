@@ -63,21 +63,6 @@ export declare namespace ReadmeGenerator {
         readonly url: URL;
     };
 
-    type MjsContent = {
-        readonly file: FileEntry;
-        readonly path: string;
-        readonly isMain: boolean;
-        readonly imports: {
-            readonly packageName: string;
-            readonly name?: string;
-            readonly file: null | FileEntry;
-            readonly path: null | string;
-        }[];
-        readonly exports: {
-            readonly name: string;
-        }[];
-    };
-
     type DtsContent = {
         readonly file: FileEntry;
         readonly path: string;
@@ -94,13 +79,28 @@ export declare namespace ReadmeGenerator {
         }[];
     };
 
+    type MjsContent = {
+        readonly file: FileEntry;
+        readonly path: string;
+        readonly isMain: boolean;
+        readonly imports: {
+            readonly packageName: string;
+            readonly name?: string;
+            readonly file: null | FileEntry;
+            readonly path: null | string;
+        }[];
+        readonly exports: {
+            readonly name: string;
+        }[];
+    };
+
     type Options = {
         readonly repositoryDirectory: ValueOrGet<FileEntry>;
         readonly readmeMdName?: ValueOrGet<string>;
         readonly packageJsonName?: ValueOrGet<string>;
         readonly packageLockJsonName?: ValueOrGet<string>;
-        readonly mjsFileNames?: ValueOrGet<string[]>;
         readonly dtsFileNames?: ValueOrGet<string[]>;
+        readonly mjsFileNames?: ValueOrGet<string[]>;
     };
 
     type EventSpecs = Record<never, never>;
@@ -128,24 +128,24 @@ export declare namespace ReadmeGenerator {
             }): URL;
         };
         readonly dependencies: Get<Promise<Dependency[]>>;
-        readonly mjsContent: {
-            (params: {
-                readonly file: FileEntry;
-            }): Promise<MjsContent>;
-        };
-        readonly mjsContents: Get<Promise<MjsContent[]>>;
         readonly dtsContent: {
             (params: {
                 readonly file: FileEntry;
             }): Promise<DtsContent>;
         };
         readonly dtsContents: Get<Promise<DtsContent[]>>;
+        readonly mjsContent: {
+            (params: {
+                readonly file: FileEntry;
+            }): Promise<MjsContent>;
+        };
+        readonly mjsContents: Get<Promise<MjsContent[]>>;
         readonly readmeMdHeaderLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdNpmInstallLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdImportLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdPackageJsonGraphLines: Get<AsyncGenerator<string, void, void>>;
-        readonly readmeMdMjsGraphsLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdDtsGraphsLines: Get<AsyncGenerator<string, void, void>>;
+        readonly readmeMdMjsGraphsLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdLines: Get<AsyncGenerator<string, void, void>>;
         readonly readmeMdLineStream: Get<StreamReadable>;
     };

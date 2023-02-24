@@ -27,11 +27,11 @@ const constructor = ((options) => {
         packageLockJsonName: hold(() => {
             return unwrap(options.packageLockJsonName) ?? 'package-lock.json';
         }),
-        mjsFileNames: hold(() => {
-            return unwrap(options.mjsFileNames) ?? ['index.mjs'];
-        }),
         dtsFileNames: hold(() => {
             return unwrap(options.dtsFileNames) ?? ['index.d.ts'];
+        }),
+        mjsFileNames: hold(() => {
+            return unwrap(options.mjsFileNames) ?? ['index.mjs'];
         }),
     });
 
@@ -108,62 +108,6 @@ const constructor = ((options) => {
                 }
             });
         }),
-        mjsContent: (async (params) => {
-            const { main: mainPath } = await _self.packageJson();
-            const { file: sourceFile } = params;
-            const sourcePath = _options.repositoryDirectory().relative(sourceFile);
-            const isMain = (sourcePath === mainPath);
-            const lines = await sourceFile.readLines();
-            const imports = lines.flatMap((line) => {
-                {
-                    const matchArray = line.match(/^import { ([^ ]+) as ([^ ]+) } from '([^']+)';$/);
-                    if (matchArray != null) {
-                        return [{ packageName: matchArray[3], name: matchArray[1] }];
-                    }
-                }
-                {
-                    const matchArray = line.match(/^import { ([^ ]+) } from '([^']+)';$/);
-                    if (matchArray != null) {
-                        return [{ packageName: matchArray[2], name: matchArray[1] }];
-                    }
-                }
-                {
-                    const matchArray = line.match(/^import '([^']+)';$/);
-                    if (matchArray != null) {
-                        return [{ packageName: matchArray[1] }];
-                    }
-                }
-                return [];
-            }).map(({ packageName, ...rest }) => {
-                const fromLocal = (packageName.startsWith('./') || packageName.startsWith('../'));
-                const file = (fromLocal === false ? null : sourceFile.resolve(packageName));
-                const path = (file == null ? null : _options.repositoryDirectory().relative(file));
-                return { packageName, ...rest, file, path };
-            });
-            const exports = lines.flatMap((line) => {
-                {
-                    const matchArray = line.match(/^export { ([^ ]+) as ([^ ]+) };$/);
-                    if (matchArray != null) {
-                        return [{ name: matchArray[2] }];
-                    }
-                }
-                {
-                    const matchArray = line.match(/^export { ([^ ]+) };$/);
-                    if (matchArray != null) {
-                        return [{ name: matchArray[1] }];
-                    }
-                }
-                return [];
-            });
-            return { ...params, path: sourcePath, isMain, imports, exports };
-        }),
-        mjsContents: hold(async () => {
-            return await Promise.all(_options.mjsFileNames().map((fileName) => {
-                return _self.mjsContent({
-                    file: _options.repositoryDirectory().resolve(fileName),
-                });
-            }));
-        }),
         dtsContent: (async (params) => {
             const { types: mainPath } = await _self.packageJson();
             const { file: sourceFile } = params;
@@ -222,6 +166,62 @@ const constructor = ((options) => {
         dtsContents: hold(async () => {
             return await Promise.all(_options.dtsFileNames().map((fileName) => {
                 return _self.dtsContent({
+                    file: _options.repositoryDirectory().resolve(fileName),
+                });
+            }));
+        }),
+        mjsContent: (async (params) => {
+            const { main: mainPath } = await _self.packageJson();
+            const { file: sourceFile } = params;
+            const sourcePath = _options.repositoryDirectory().relative(sourceFile);
+            const isMain = (sourcePath === mainPath);
+            const lines = await sourceFile.readLines();
+            const imports = lines.flatMap((line) => {
+                {
+                    const matchArray = line.match(/^import { ([^ ]+) as ([^ ]+) } from '([^']+)';$/);
+                    if (matchArray != null) {
+                        return [{ packageName: matchArray[3], name: matchArray[1] }];
+                    }
+                }
+                {
+                    const matchArray = line.match(/^import { ([^ ]+) } from '([^']+)';$/);
+                    if (matchArray != null) {
+                        return [{ packageName: matchArray[2], name: matchArray[1] }];
+                    }
+                }
+                {
+                    const matchArray = line.match(/^import '([^']+)';$/);
+                    if (matchArray != null) {
+                        return [{ packageName: matchArray[1] }];
+                    }
+                }
+                return [];
+            }).map(({ packageName, ...rest }) => {
+                const fromLocal = (packageName.startsWith('./') || packageName.startsWith('../'));
+                const file = (fromLocal === false ? null : sourceFile.resolve(packageName));
+                const path = (file == null ? null : _options.repositoryDirectory().relative(file));
+                return { packageName, ...rest, file, path };
+            });
+            const exports = lines.flatMap((line) => {
+                {
+                    const matchArray = line.match(/^export { ([^ ]+) as ([^ ]+) };$/);
+                    if (matchArray != null) {
+                        return [{ name: matchArray[2] }];
+                    }
+                }
+                {
+                    const matchArray = line.match(/^export { ([^ ]+) };$/);
+                    if (matchArray != null) {
+                        return [{ name: matchArray[1] }];
+                    }
+                }
+                return [];
+            });
+            return { ...params, path: sourcePath, isMain, imports, exports };
+        }),
+        mjsContents: hold(async () => {
+            return await Promise.all(_options.mjsFileNames().map((fileName) => {
+                return _self.mjsContent({
                     file: _options.repositoryDirectory().resolve(fileName),
                 });
             }));
@@ -326,51 +326,6 @@ const constructor = ((options) => {
             }
             yield '~~~~~';
         }),
-        readmeMdMjsGraphsLines: (async function* () {
-            const packageRepositoryName = await _self.packageRepositoryName();
-            const mjsContents = await _self.mjsContents();
-            for (const mjsContent of mjsContents) {
-                /** @type {Map<string, Map<string, {}>>} */
-                const map0 = new Map();
-                for (const item of mjsContent.imports) {
-                    const packageName = (item.path ?? item.packageName);
-                    let map1 = map0.get(packageName);
-                    if (map1 == null) {
-                        map1 = new Map();
-                        map0.set(packageName, map1);
-                    }
-                    map1.set(item.name ?? ' ', {});
-                }
-                yield '';
-                yield '~~~~~ mermaid';
-                yield 'graph RL;';
-                if (mjsContent.exports.length > 0) {
-                    const name = (mjsContent.isMain ? packageRepositoryName : ' ');
-                    yield `  subgraph "${name}";`;
-                    for (const { i, name } of mjsContent.exports.map((value, i) => ({ i, ...value }))) {
-                        yield `    E_${i}(["${name}"]);`;
-                    }
-                    yield '  end;';
-                }
-                yield `  M["${mjsContent.path}"]`;
-                for (const { i, packageName, map1 } of [...map0].map(([packageName, map1], i) => ({ i, packageName, map1 }))) {
-                    yield `  subgraph "${packageName}";`;
-                    for (const { j, name } of [...map1].map(([name], j) => ({ j, name }))) {
-                        yield `    I_${i}_${j}(["${name}"]);`;
-                    }
-                    yield '  end;';
-                }
-                for (const { i, map1 } of [...map0].map(([_, map1], i) => ({ i, map1 }))) {
-                    for (const { j } of [...map1].map((_, j) => ({ j }))) {
-                        yield `  M ----> I_${i}_${j};`;
-                    }
-                }
-                for (const { i } of mjsContent.exports.map((_, i) => ({ i }))) {
-                    yield `  E_${i} ----> M;`;
-                }
-                yield '~~~~~';
-            }
-        }),
         readmeMdDtsGraphsLines: (async function* () {
             const packageRepositoryName = await _self.packageRepositoryName();
             const dtsContents = await _self.dtsContents();
@@ -416,13 +371,58 @@ const constructor = ((options) => {
                 yield '~~~~~';
             }
         }),
+        readmeMdMjsGraphsLines: (async function* () {
+            const packageRepositoryName = await _self.packageRepositoryName();
+            const mjsContents = await _self.mjsContents();
+            for (const mjsContent of mjsContents) {
+                /** @type {Map<string, Map<string, {}>>} */
+                const map0 = new Map();
+                for (const item of mjsContent.imports) {
+                    const packageName = (item.path ?? item.packageName);
+                    let map1 = map0.get(packageName);
+                    if (map1 == null) {
+                        map1 = new Map();
+                        map0.set(packageName, map1);
+                    }
+                    map1.set(item.name ?? ' ', {});
+                }
+                yield '';
+                yield '~~~~~ mermaid';
+                yield 'graph RL;';
+                if (mjsContent.exports.length > 0) {
+                    const name = (mjsContent.isMain ? packageRepositoryName : ' ');
+                    yield `  subgraph "${name}";`;
+                    for (const { i, name } of mjsContent.exports.map((value, i) => ({ i, ...value }))) {
+                        yield `    E_${i}(["${name}"]);`;
+                    }
+                    yield '  end;';
+                }
+                yield `  M["${mjsContent.path}"]`;
+                for (const { i, packageName, map1 } of [...map0].map(([packageName, map1], i) => ({ i, packageName, map1 }))) {
+                    yield `  subgraph "${packageName}";`;
+                    for (const { j, name } of [...map1].map(([name], j) => ({ j, name }))) {
+                        yield `    I_${i}_${j}(["${name}"]);`;
+                    }
+                    yield '  end;';
+                }
+                for (const { i, map1 } of [...map0].map(([_, map1], i) => ({ i, map1 }))) {
+                    for (const { j } of [...map1].map((_, j) => ({ j }))) {
+                        yield `  M ----> I_${i}_${j};`;
+                    }
+                }
+                for (const { i } of mjsContent.exports.map((_, i) => ({ i }))) {
+                    yield `  E_${i} ----> M;`;
+                }
+                yield '~~~~~';
+            }
+        }),
         readmeMdLines: (async function* () {
             yield* _self.readmeMdHeaderLines();
             yield* _self.readmeMdNpmInstallLines();
             yield* _self.readmeMdImportLines();
             yield* _self.readmeMdPackageJsonGraphLines();
-            yield* _self.readmeMdMjsGraphsLines();
             yield* _self.readmeMdDtsGraphsLines();
+            yield* _self.readmeMdMjsGraphsLines();
         }),
         readmeMdLineStream: (() => {
             return StreamReadable.from(_self.readmeMdLines(), {
