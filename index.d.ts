@@ -57,15 +57,21 @@ export declare namespace ReadmeGenerator {
         readonly name: string;
         readonly versionRange: string;
         readonly dev: boolean;
+        readonly repositoryType: string;
         readonly packageName: string;
+        readonly lockVersion: string;
         readonly url: URL;
     };
 
     type MjsContent = {
         readonly file: FileEntry;
+        readonly path: string;
+        readonly isMain: boolean;
         readonly imports: {
             readonly packageName: string;
             readonly name?: string;
+            readonly file: null | FileEntry;
+            readonly path: null | string;
         }[];
         readonly exports: {
             readonly name: string;
@@ -74,9 +80,13 @@ export declare namespace ReadmeGenerator {
 
     type DtsContent = {
         readonly file: FileEntry;
+        readonly path: string;
+        readonly isMain: boolean;
         readonly imports: {
             readonly packageName: string;
             readonly name?: string;
+            readonly file: null | FileEntry;
+            readonly path: null | string;
         }[];
         readonly exports: {
             readonly exportType: string;
@@ -89,8 +99,8 @@ export declare namespace ReadmeGenerator {
         readonly readmeMdName?: ValueOrGet<string>;
         readonly packageJsonName?: ValueOrGet<string>;
         readonly packageLockJsonName?: ValueOrGet<string>;
-        readonly mjsFileNames: ValueOrGet<string[]>;
-        readonly dtsFileNames: ValueOrGet<string[]>;
+        readonly mjsFileNames?: ValueOrGet<string[]>;
+        readonly dtsFileNames?: ValueOrGet<string[]>;
     };
 
     type EventSpecs = Record<never, never>;
