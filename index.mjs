@@ -238,7 +238,7 @@ const constructor = ((options) => {
             yield '~~~~~';
         }),
         readmeMdImportLines: (async function* () {
-            const packageRepositoryName = await _self.packageRepositoryName();
+            const packageName = await _self.packageName();
             const dtsContents = await _self.dtsContents();
             const indexDtsContent = dtsContents.find((dtsContent) => {
                 return dtsContent.isMain;
@@ -251,7 +251,7 @@ const constructor = ((options) => {
                     yield '';
                     yield '~~~~~ mjs';
                     for (const { name } of exportConsts) {
-                        yield `import { ${name} } from '${packageRepositoryName}';`;
+                        yield `import { ${name} } from '${packageName}';`;
                     }
                     yield '~~~~~';
                 }
