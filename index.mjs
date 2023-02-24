@@ -136,7 +136,7 @@ const constructor = ((options) => {
                 return [];
             }).map(({ packageName, ...rest }) => {
                 const fromLocal = (packageName.startsWith('./') || packageName.startsWith('../'));
-                const file = (fromLocal === false ? null : sourceFile.resolve(packageName));
+                const file = (fromLocal === false ? null : sourceFile.parent().resolve(packageName));
                 const path = (file == null ? null : _options.repositoryDirectory().relative(file));
                 return { packageName, ...rest, file, path };
             });
@@ -198,7 +198,7 @@ const constructor = ((options) => {
                 return [];
             }).map(({ packageName, ...rest }) => {
                 const fromLocal = (packageName.startsWith('./') || packageName.startsWith('../'));
-                const file = (fromLocal === false ? null : sourceFile.resolve(packageName));
+                const file = (fromLocal === false ? null : sourceFile.parent().resolve(packageName));
                 const path = (file == null ? null : _options.repositoryDirectory().relative(file));
                 return { packageName, ...rest, file, path };
             });
